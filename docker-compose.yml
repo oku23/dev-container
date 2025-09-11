@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        NODE_VERSION: 20
+    volumes:
+  - ./workspace/app:/workspace:delegated
+  - /workspace/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=db
+      - DATABASE_USER=dev
+      - DATABASE_PASSWORD=devpass
+      - DATABASE_NAME=devdb
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=devpass
+      - POSTGRES_DB=devdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  spring:
+    image: openjdk:latest
+    working_dir: /workspace/spring
+    volumes:
+      - ./workspace/spring:/workspace/spring:delegated
+      - ./workspace/.gradle:/root/.gradle
+      - ./workspace/.m2:/root/.m2
+    command: >-
+      bash -lc "if [ -x ./gradlew ]; then chmod +x ./gradlew && ./gradlew bootRun; \
+      elif [ -x ./mvnw ]; then chmod +x ./mvnw && ./mvnw spring-boot:run; \
+      else apt-get update && apt-get install -y --no-install-recommends gradle maven && \
+      if command -v gradle >/dev/null 2>&1; then gradle bootRun; else mvn spring-boot:run; fi; fi"
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
