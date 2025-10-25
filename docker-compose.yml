@@ -41,7 +41,9 @@ services:
       - bash
       - -lc
       - |
-        if [ -x ./gradlew ]; then
+        if command -v gradle >/dev/null 2>&1; then
+          gradle bootRun
+        elif [ -x ./gradlew ]; then
           chmod +x ./gradlew && ./gradlew bootRun
         elif [ -x ./mvnw ]; then
           chmod +x ./mvnw && ./mvnw spring-boot:run
