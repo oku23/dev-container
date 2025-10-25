@@ -1,0 +1,4 @@
+# Gradle wrapper caches
+.gradle/
+.gradle/**
+**/wrapper/dists/
