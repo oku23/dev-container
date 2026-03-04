@@ -18,3 +18,7 @@ DB の接続情報(デフォルト):
 - database: devdb
 
 必要に応じて Node バージョンや環境変数、サービスは `docker-compose.yml` と `.devcontainer/Dockerfile` を編集してください。
+
+---
+
+コンテナから GitHub へ PR を投げる方法: [docs/ssh-agent.md](docs/ssh-agent.md)

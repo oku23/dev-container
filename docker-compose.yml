@@ -9,6 +9,10 @@ services:
     volumes:
       - ./workspace/app:/workspace:delegated
       - /workspace/node_modules
+      - .:/project:delegated
+      - ~/.gitconfig:/home/node/.gitconfig:ro
+      - ${SSH_AUTH_SOCK}:/ssh-agent
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "3000:3000"
     environment:
@@ -17,6 +21,11 @@ services:
       - DATABASE_USER=dev
       - DATABASE_PASSWORD=devpass
       - DATABASE_NAME=devdb
+      - SSH_AUTH_SOCK=/ssh-agent
+      - GIT_CONFIG_COUNT=1
+      - GIT_CONFIG_KEY_0=safe.directory
+      - GIT_CONFIG_VALUE_0=/project
+    command: sleep infinity
     depends_on:
       - db
 
@@ -31,21 +40,32 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   spring:
-    image: openjdk:latest
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile.spring
     working_dir: /workspace
     volumes:
       - ./workspace/spring:/workspace:delegated
       - ./workspace/.gradle:/root/.gradle
       - ./workspace/.m2:/root/.m2
+      - .:/project:delegated
+      - ~/.gitconfig:/root/.gitconfig:ro
+      - ${SSH_AUTH_SOCK}:/ssh-agent
     command: >-
       bash -lc "if [ -x ./gradlew ]; then chmod +x ./gradlew && ./gradlew bootRun; \
       elif [ -x ./mvnw ]; then chmod +x ./mvnw && ./mvnw spring-boot:run; \
-      else apt-get update && apt-get install -y --no-install-recommends gradle maven && \
-      if command -v gradle >/dev/null 2>&1; then gradle bootRun; else mvn spring-boot:run; fi; fi"
+      elif [ -f build.gradle ] || [ -f pom.xml ]; then \
+      apt-get update && apt-get install -y --no-install-recommends gradle maven && \
+      if command -v gradle >/dev/null 2>&1; then gradle bootRun; else mvn spring-boot:run; fi; \
+      else echo 'No Spring project found. Waiting...' && sleep infinity; fi"
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - SSH_AUTH_SOCK=/ssh-agent
+      - GIT_CONFIG_COUNT=1
+      - GIT_CONFIG_KEY_0=safe.directory
+      - GIT_CONFIG_VALUE_0=/project
     depends_on:
       - db
 

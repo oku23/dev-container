@@ -11,6 +11,7 @@
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash"
   },
+  "postStartCommand": "sudo chmod 666 /var/run/docker.sock || true",
   "postCreateCommand": "npm install || true",
-  "remoteUser": "vscode"
+  "remoteUser": "node"
 }
