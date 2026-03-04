@@ -32,9 +32,9 @@ services:
 
   spring:
     image: openjdk:latest
-    working_dir: /workspace/spring
+    working_dir: /workspace
     volumes:
-      - ./workspace/spring:/workspace/spring:delegated
+      - ./workspace/spring:/workspace:delegated
       - ./workspace/.gradle:/root/.gradle
       - ./workspace/.m2:/root/.m2
     command: >-

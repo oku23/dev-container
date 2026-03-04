@@ -2,3 +2,9 @@
 .vscode/
 .idea/
 .DS_Store
+
+# Build tool caches
+workspace/.gradle/*
+workspace/.m2/*
+!workspace/.gradle/.gitkeep
+!workspace/.m2/.gitkeep
