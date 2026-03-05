@@ -9,6 +9,7 @@ services:
     volumes:
       - ./workspace/app:/workspace:delegated
       - /workspace/node_modules
+      - ./workspace/spring:/workspace/spring:delegated
       - .:/project:delegated
       - ~/.gitconfig:/home/node/.gitconfig:ro
       - ${SSH_AUTH_SOCK}:/ssh-agent
